@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc Mừng 20/11</title>
+    <!-- Tải Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Sử dụng phông chữ Inter mặc định --><style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fce7f3; /* Màu hồng nhạt, nền lễ hội */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; /* Ẩn thanh cuộn khi bong bóng ra ngoài */
+            position: relative;
+        }
+
+        /* Heart Button Shape using custom CSS and SVG */
+        .heart-button {
+            position: relative;
+            cursor: pointer;
+            width: 200px; /* Tăng kích thước trái tim */
+            height: 200px; /* Tăng kích thước trái tim */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent;
+            border: none;
+            transition: transform 0.2s ease-in-out;
+            z-index: 10;
+        }
+
+        .heart-button:active {
+            transform: scale(0.95);
+        }
+
+        .heart-svg {
+            width: 100%;
+            height: 100%;
+            fill: #ef4444; /* Màu đỏ trái tim */
+            filter: drop-shadow(0 4px 6px rgba(239, 68, 68, 0.5));
+            transition: fill 0.3s;
+        }
+        
+        /* Tấm Thiệp (Postcard) */
+        .postcard {
+            background-color: #fff;
+            border: 2px solid #f97316; /* Màu cam để làm nổi bật */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 20;
+            width: 95%; /* Tăng chiều rộng tối đa */
+            max-width: 550px; /* Tăng chiều rộng tối đa */
+            min-height: 450px; /* Tăng chiều cao tối thiểu */
+            padding: 50px 30px; /* Tăng padding */
+            /* Tạo hiệu ứng dòng kẻ: chu kỳ 40px (39px trắng + 1px vàng) */
+            background-image: repeating-linear-gradient(
+                #fff, 
+                #fff 39px, 
+                #fcd34d 40px 
+            ); 
+            background-size: 100% 40px; /* Tổng chiều cao 40px */
+            background-position-y: 10px;
+        }
+
+        /* CĂN CHỈNH VĂN BẢN TRÊN DÒNG */
+        .postcard .aligned-text {
+            /* Line height phải khớp chính xác với background-size cycle (40px) */
+            font-size: 1.65rem; /* ~26.4px, kích thước chữ phù hợp với line-height 40px */
+            line-height: 40px; 
+        }
+
+        /* Bong Bóng Bay (Balloons) */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .balloon {
+            position: fixed;
+            font-size: 50px; /* Tăng kích thước bong bóng */
+            animation: floatUp 15s infinite ease-in;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        .left-balloon {
+            left: 5%;
+            animation-duration: 12s;
+            animation-delay: 0s;
+        }
+
+        .right-balloon {
+            right: 5%;
+            animation-duration: 18s;
+            animation-delay: -5s;
+        }
+        
+        .left-balloon:nth-child(2) {
+            left: 15%;
+            animation-delay: -8s;
+            animation-duration: 14s;
+        }
+        
+        .right-balloon:nth-child(2) {
+            right: 15%;
+            animation-delay: -3s;
+            animation-duration: 16s;
+        }
+
+    </style>
+</head>
+<body x-data="app()">
+
+    <!-- Bong Bóng Bay Ngẫu Nhiên --><template x-for="(balloon, index) in balloons" :key="index">
+        <div class="balloon" :class="balloon.side" :style="balloon.style" x-text="balloon.emoji"></div>
+    </template>
+    
+    <!-- Vùng Nút Trái Tim --><div class="flex flex-col items-center justify-center p-4">
+        <button id="heartButton" @click="showWish()" class="heart-button">
+            <!-- SVG Heart Icon --><svg class="heart-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span class="absolute text-white font-bold text-xl md:text-2xl tracking-wider pointer-events-none">
+                Press Me
+            </span>
+        </button>
+        <p class="mt-4 text-gray-700 text-base italic">Nhấn vào trái tim để nhận lời chúc 20/11!</p>
+    </div>
+
+    <!-- Modal Hiển Thị Thiệp Chúc Mừng --><div x-show="isModalOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-90" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-90" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" style="display: none;">
+        
+        <!-- Thiệp Chúc Mừng (Postcard) --><div class="postcard rounded-xl transform rotate-1 md:rotate-0">
+            <!-- Bouquet 1 (Top Left) --><div class="absolute top-[-30px] left-[-40px] text-6xl transform rotate-[-15deg]"> <!-- Tăng kích thước bó hoa -->💐
+            </div>
+            <!-- Bouquet 2 (Bottom Right) --><div class="absolute bottom-[-30px] right-[-40px] text-6xl transform rotate-[15deg]"> <!-- Tăng kích thước bó hoa -->🌸
+            </div>
+
+            <!-- Nội Dung Thiệp --><div class="flex flex-col h-full items-center justify-center text-center">
+                <h2 class="text-3xl font-bold text-pink-600 mb-8 border-b-2 border-pink-300 pb-3">Gửi Tấm Lòng Tri Ân</h2> <!-- Tăng kích thước tiêu đề --><p x-text="currentWish" class="aligned-text text-gray-800 font-medium whitespace-pre-wrap tracking-wide mb-10"></p> <!-- Đã thay bằng class aligned-text --><button @click="isModalOpen = false" class="mt-auto px-8 py-3 bg-pink-500 text-white font-semibold rounded-full hover:bg-pink-600 transition shadow-lg text-lg"> <!-- Tăng kích thước nút -->Đã Nhận
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript Logic --><script>
+        // Array chứa 40 lời chúc
+        const wishes = [
+            "Nhân dịp 20/11, kính chúc thầy cô luôn mạnh khỏe, hạnh phúc và thành công trong sự nghiệp trồng người",
+            "Nhân dịp 20/11, chúc thầy cô có thật nhiều niềm vui, may mắn và bình an trong cuộc sống",
+            "Nhân dịp 20/11, em xin gửi lời tri ân sâu sắc đến thầy cô đã tận tâm dìu dắt chúng em",
+            "Nhân dịp 20/11, chúc thầy cô luôn giữ vững ngọn lửa nhiệt huyết để truyền đạt tri thức cho bao thế hệ học trò",
+            "Nhân dịp 20/11, kính chúc thầy cô luôn là tấm gương sáng cho học trò noi theo",
+            "Nhân dịp 20/11, chúc thầy cô có một ngày lễ thật ý nghĩa và tràn đầy yêu thương",
+            "Nhân dịp 20/11, xin gửi lời cảm ơn chân thành đến thầy cô vì những bài học quý giá",
+            "Nhân dịp 20/11, chúc thầy cô luôn được học trò yêu quý và kính trọng",
+            "Nhân dịp 20/11, kính chúc thầy cô luôn dồi dào sức khỏe để tiếp tục sự nghiệp giáo dục",
+            "Nhân dịp 20/11, chúc thầy cô có nhiều thành công mới và niềm vui mới trong cuộc sống",
+            "Nhân dịp 20/11, em chúc thầy cô luôn vui vẻ, trẻ trung và tràn đầy năng lượng",
+            "Nhân dịp 20/11, chúc thầy cô lúc nào cũng nở nụ cười rạng rỡ trên môi",
+            "Nhân dịp 20/11, mong thầy cô luôn hạnh phúc bên gia đình và học trò",
+            "Nhân dịp 20/11, chúc thầy cô có thật nhiều kỷ niệm đẹp cùng học sinh",
+            "Nhân dịp 20/11, em chúc thầy cô luôn yêu đời và yêu nghề",
+            "Nhân dịp 20/11, chúc thầy cô luôn có những giờ dạy đầy cảm hứng",
+            "Nhân dịp 20/11, mong thầy cô luôn được học trò kính trọng và đồng nghiệp yêu mến",
+            "Nhân dịp 20/11, chúc thầy cô luôn giữ được trái tim nhiệt huyết với nghề",
+            "Nhân dịp 20/11, em chúc thầy cô luôn khỏe mạnh để đồng hành cùng chúng em",
+            "Nhân dịp 20/11, chúc thầy cô có một ngày lễ thật vui và đáng nhớ",
+            "Nhân dịp 20/11, chúc thầy cô luôn trẻ trung như học trò… nhưng không phải lo làm bài kiểm tra",
+            "Nhân dịp 20/11, kính chúc thầy cô sức khỏe dồi dào, để còn đủ năng lượng “trị” tụi học trò nghịch ngợm",
+            "Nhân dịp 20/11, chúc thầy cô mãi là ngọn hải đăng… nhưng đừng soi quá kỹ bài kiểm tra của em nhé",
+            "Nhân dịp 20/11, chúc thầy cô luôn thành công trong sự nghiệp giáo dục, và thành công hơn nữa trong việc “giữ bình tĩnh” trước lớp học ồn ào",
+            "Nhân dịp 20/11, em chúc thầy cô luôn bình an và may mắn… đặc biệt là may mắn khi gọi trúng học trò biết bài",
+            "Nhân dịp 20/11, chúc thầy cô có một ngày lễ thật ý nghĩa, không phải chấm bài, không phải họp hành",
+            "Nhân dịp 20/11, chúc thầy cô luôn giữ được tình yêu nghề cháy bỏng… như tình yêu học trò dành cho giờ ra chơi",
+            "Nhân dịp 20/11, em chúc thầy cô luôn vui vẻ bên học trò thân yêu, kể cả khi học trò “quên làm bài tập”",
+            "Nhân dịp 20/11, chúc thầy cô mãi là người lái đò tận tụy… nhưng đò lúc nào cũng chạy bằng “năng lượng tích cực”",
+            "Nhân dịp 20/11, kính chúc thầy cô luôn hạnh phúc và tràn đầy yêu thương, kể cả khi học trò viết chữ như “mật mã”",
+            "Nhân dịp 20/11, chúc thầy cô luôn rạng rỡ như ánh mặt trời trong lớp học",
+            "Nhân dịp 20/11, chúc thầy cô lúc nào cũng đầy năng lượng như pin sạc đầy",
+            "Nhân dịp 20/11, chúc thầy cô luôn vui vẻ như ngày nghỉ lễ",
+            "Nhân dịp 20/11, chúc thầy cô luôn kiên nhẫn như siêu anh hùng",
+            "Nhân dịp 20/11, chúc thầy cô luôn hạnh phúc như trúng số độc đắc",
+            "Nhân dịp 20/11, chúc thầy cô luôn trẻ trung như sinh viên năm nhất",
+            "Nhân dịp 20/11, chúc thầy cô luôn tươi cười như hoa nở mùa xuân",
+            "Nhân dịp 20/11, chúc thầy cô luôn bình an như biển lặng sóng",
+            "Nhân dịp 20/11, chúc thầy cô luôn vui nhộn như giờ ra chơi",
+            "Nhân dịp 20/11, chúc thầy cô luôn hạnh phúc như được nghỉ hè dài ngày"
+        ];
+
+        // Khởi tạo Alpine.js (sử dụng x-data)
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('app', () => ({
+                isModalOpen: false,
+                currentWish: '',
+                balloons: [], // Dùng để lưu trữ các quả bóng bay
+                
+                init() {
+                    // Tạo ngẫu nhiên 4 quả bóng bay (2 trái, 2 phải)
+                    this.balloons = [
+                        { emoji: '🎈', side: 'left-balloon', style: this.getBalloonStyle() },
+                        { emoji: '💖', side: 'left-balloon', style: this.getBalloonStyle() },
+                        { emoji: '🎉', side: 'right-balloon', style: this.getBalloonStyle() },
+                        { emoji: '🎈', side: 'right-balloon', style: this.getBalloonStyle() },
+                    ];
+                },
+
+                getBalloonStyle() {
+                    // Tạo kiểu ngẫu nhiên cho vị trí và thời gian bay
+                    const duration = 12 + Math.random() * 8; // 12s - 20s
+                    const delay = -1 * (Math.random() * 10); // -10s - 0s
+                    return `animation-duration: ${duration}s; animation-delay: ${delay}s; bottom: ${-50 + Math.random() * 100}px;`;
+                },
+
+                showWish() {
+                    // 1. Lấy lời chúc ngẫu nhiên
+                    const randomIndex = Math.floor(Math.random() * wishes.length);
+                    
+                    // 2. Chuyển lời chúc thành chuỗi với ngắt dòng (sau dấu câu để căn giữa đẹp hơn)
+                    this.currentWish = wishes[randomIndex].replace(/(\.|\?|\!)(?=\s)/g, '$1\n'); 
+                    
+                    // 3. Hiển thị modal
+                    this.isModalOpen = true;
+                }
+            }));
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</body>
+</html>
